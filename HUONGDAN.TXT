@@ -1,22 +1,162 @@
-link sources code được public trên github: https://github.com/dh19pm/qlnhansu
+Giai đoạn 1: Chuẩn bị Môi trường Phát triển
 
-#chạy code bằng 1 số lệnh sau đây:
+Trước khi cài đặt dự án, bạn cần đảm bảo máy tính đã có các công cụ cần thiết:
+
+PHP:
+
+Cài đặt: Sử dụng XAMPP (như bạn đang dùng), WAMP, Laragon (khuyến nghị cho Windows) hoặc cài đặt thủ công PHP. Đảm bảo phiên bản PHP tương thích với dự án (thường là PHP 7.3+ hoặc 8.x).
+Kiểm tra: php -v
+Extension gd: Rất quan trọng cho việc xử lý hình ảnh, thường được yêu cầu bởi các thư viện như PhpSpreadsheet (dùng trong maatwebsite/excel).
+Lỗi có thể gặp khi thiếu ext-gd (lúc chạy composer install):
+Root composer.json requires PHP extension ext-gd * but it is missing from your system.
+Cách sửa (cho XAMPP):
+Mở tệp C:\xampp\php\php.ini.
+Tìm dòng extension=gd (hoặc ;extension=gd).
+Xóa dấu chấm phẩy (;) ở đầu dòng (nếu có) để thành extension=gd.
+Lưu tệp php.ini.
+Khởi động lại Apache từ XAMPP Control Panel.
+Composer:
+
+Cài đặt: Tải từ getcomposer.org.
+Kiểm tra: composer --version
+Node.js và NPM:
+
+Cài đặt: Tải phiên bản LTS từ nodejs.org (NPM đi kèm với Node.js).
+Kiểm tra: node -v và npm -v
+Cơ sở dữ liệu (CSDL):
+
+Cài đặt: MySQL (thường đi kèm XAMPP), PostgreSQL, hoặc SQLite.
+Hành động: Tạo một CSDL trống cho dự án (ví dụ: quanly_nhansu_db). Ghi nhớ tên CSDL, username và password để kết nối.
+Giai đoạn 2: Các bước Thực hiện Cài đặt Dự án và Xử lý Lỗi
+
+Giả định: Bạn đã tải/clone mã nguồn dự án vào một thư mục trên máy và đã mở trình dòng lệnh (PowerShell) tại thư mục đó.
+
+Sao chép và Cấu hình tệp .env:
+
+Lệnh: (trong thư mục gốc dự án)
+PowerShell
+
+cp .env.example .env
+Chỉnh sửa tệp .env: Mở tệp .env và cập nhật các thông tin sau:
+Ini, TOML
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=ten_database_cua_ban // THAY BẰNG TÊN DATABASE BẠN ĐÃ TẠO
+DB_USERNAME=root                 // THAY BẰNG USERNAME CSDL CỦA BẠN
+DB_PASSWORD=mat_khau_csdl        // THAY BẰNG MẬT KHẨU CSDL (để trống nếu không có)
+
+APP_NAME="Quan Ly Nhan Su"
+APP_ENV=local
+APP_KEY= // Sẽ được tạo ở bước sau
+APP_DEBUG=true
+APP_URL=http://localhost // Hoặc http://127.0.0.1:8000
+Cài đặt các gói phụ thuộc PHP (composer install):
+
+Lệnh:
+PowerShell
 
 composer install
-composer update
-npm install (cài thư viện nodejs)
-npm run dev (lưu ý nếu không chạy dòng này code không thể chạy được vì không render ra dc view)
-php artisan key:generate (tạo file .env rồi chạy lệnh này)
+Lỗi có thể gặp và cách sửa bạn đã trải qua:
+Thiếu ext-gd: Đã hướng dẫn ở phần chuẩn bị môi trường.
+Phiên bản PHP không tương thích với composer.lock:
+Your lock file does not contain a compatible set of packages. Please run composer update.
+Problem X: ... requires php ... <8.2 -> your php version (8.2.12) does not satisfy that requirement.
+Cách sửa:
+Xóa tệp composer.lock.
+Xóa thư mục vendor (nếu có).
+Chạy lại composer install.
+Cài đặt các gói phụ thuộc JavaScript (npm install):
+
+Lệnh:
+PowerShell
+
+npm install
+Thông báo có thể gặp (bạn đã gặp):
+Cảnh báo "deprecated" (querystring, uuid, popper.js):
+npm warn deprecated querystring@0.2.0: The querystring API is considered Legacy...
+Giải thích: Các gói này cũ, nhưng thường không ngăn ứng dụng chạy. Có thể bỏ qua cho mục tiêu chạy thử.
+Báo cáo "vulnerabilities":
+50 vulnerabilities (4 low, 11 moderate, 30 high, 5 critical)
+Giải thích: Có lỗ hổng bảo mật trong các gói. Đối với môi trường phát triển cục bộ, rủi ro thấp hơn. Có thể xem xét npm audit fix sau khi ứng dụng đã chạy ổn định, nhưng cẩn thận vì npm audit fix --force có thể gây lỗi không tương thích.
+Biên dịch tài sản frontend (npm run dev):
+
+Lệnh:
+PowerShell
+
+npm run dev
+Lỗi có thể gặp và cách sửa:
+Lỗi ERR_OSSL_EVP_UNSUPPORTED (do Node.js v17+ và OpenSSL 3.0):
+Error: error:0308010C:digital envelope routines::unsupported
+code: 'ERR_OSSL_EVP_UNSUPPORTED'
+
+
+Cách sửa lâu dài (khuyến nghị):
+Cài đặt cross-env:
+PowerShell
+
+npm install --save-dev cross-env
+Sửa tệp package.json, trong phần "scripts", sửa dòng thực thi mix (thường là script "development" hoặc "prod"):
+JSON
+
+// Ví dụ
+"development": "cross-env NODE_OPTIONS=--openssl-legacy-provider mix",
+Sau đó chạy npm run dev bình thường.
+Cảnh báo Browserslist: caniuse-lite is outdated:
+Browserslist: caniuse-lite is outdated. Please run: npx browserslist@latest --update-db
+Giải thích: Dữ liệu trình duyệt cũ. Có thể chạy lệnh npx browserslist@latest --update-db để cập nhật, không khẩn cấp.
+Lưu ý quan trọng: Giữ cửa sổ PowerShell đang chạy npm run dev này MỞ. Nó sẽ theo dõi và tự động biên dịch lại tài sản frontend.
+Mở một cửa sổ PowerShell MỚI:
+
+Tất cả các lệnh php artisan sau đây sẽ được chạy trong cửa sổ PowerShell MỚI này.
+Trong cửa sổ mới, điều hướng vào thư mục gốc của dự án: cd C:\Users\nguyennhat\Documents\qlnhansu\qlns.
+Tạo Application Key (php artisan key:generate):
+
+Lệnh: (trong cửa sổ PowerShell MỚI)
+PowerShell
+
+php artisan key:generate
+Kết quả: Application key set successfully. (Khóa APP_KEY được cập nhật trong .env).
+Chạy Migrations (php artisan migrate):
+
+Lệnh: (trong cửa sổ PowerShell MỚI)
+PowerShell
+
 php artisan migrate
+Kết quả: Các bảng được tạo trong CSDL.
+Lỗi có thể gặp: Sai cấu hình CSDL trong .env, CSDL server chưa chạy, database chưa được tạo.
+Chạy Seeders (Tạo dữ liệu mẫu):
+
+Bạn ban đầu muốn bỏ qua, sau đó quyết định chạy.
+Lệnh: (trong cửa sổ PowerShell MỚI)
+PowerShell
+
 php artisan db:seed
+Lỗi có thể gặp và cách sửa bạn đã trải qua:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'admin@email.com' for key 'users_email_unique': Nguyên nhân: Cố gắng chèn dữ liệu đã tồn tại (email admin@email.com đã có). Cách sửa (khuyến nghị và bạn đã làm theo hướng này sau đó):
+PowerShell
 
-#các tài khoản được dùng
+php artisan migrate:fresh --seed
+Lệnh này sẽ:
+Xóa tất cả các bảng.
+Chạy lại toàn bộ migrations.
+Chạy lại toàn bộ seeders trên một CSDL sạch. (Sau khi chạy lệnh này thành công, bạn không cần chạy php artisan migrate hay php artisan db:seed riêng lẻ nữa cho lần thiết lập này).
+Chạy server phát triển Laravel (php artisan serve):
 
-user: admin@email.com
-pass: 123
+Lệnh: (trong cửa sổ PowerShell MỚI, sau khi migrate và seed thành công)
+PowerShell
 
-user: quanly@email.com
-pass: 123
+php artisan serve
+Kết quả: Server bắt đầu chạy, thường ở địa chỉ http://127.0.0.1:8000.
+INFO  Server running on [http://127.0.0.1:8000].
+Lưu ý quan trọng: Giữ cửa sổ PowerShell đang chạy php artisan serve này MỞ.
+Truy cập Ứng dụng:
 
-user: nhanvien@email.com
-pass: 123
+Mở trình duyệt web (Chrome, Firefox, v.v.).
+Đi đến địa chỉ: http://127.0.0.1:8000 (hoặc http://localhost:8000).
+Tóm tắt các cửa sổ Terminal đang chạy (sau khi hoàn tất):
+
+Cửa sổ PowerShell 1: Chạy npm run dev (biên dịch frontend).
+Cửa sổ PowerShell 2: Chạy php artisan serve (chạy server backend Laravel).
+Cả hai cần được giữ mở để ứng dụng hoạt động
