@@ -160,3 +160,6 @@ Tóm tắt các cửa sổ Terminal đang chạy (sau khi hoàn tất):
 Cửa sổ PowerShell 1: Chạy npm run dev (biên dịch frontend).
 Cửa sổ PowerShell 2: Chạy php artisan serve (chạy server backend Laravel).
 Cả hai cần được giữ mở để ứng dụng hoạt động
+
+cai them
+npm install chart.js vue-chartjs
