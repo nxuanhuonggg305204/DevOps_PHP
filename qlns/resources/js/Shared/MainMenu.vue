@@ -1,76 +1,60 @@
 <template>
   <div>
-    <div class="mb-4">
-      <inertia-link class="flex items-center group py-3" :href="route('dashboard')">
-        <icon name="dashboard" class="w-4 h-4 mr-2" :class="isUrl('') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
-        <div :class="isUrl('') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Trang Chủ</div>
-      </inertia-link>
-    </div>
-    <div v-if="$page.props.auth.user.role == 2" class="mb-4">
-      <inertia-link class="flex items-center group py-3" :href="route('heso')">
-        <icon name="heso" class="w-4 h-4 mr-2" :class="isUrl('heso') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
-        <div :class="isUrl('heso') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Hệ Số</div>
-      </inertia-link>
-    </div>
-    <div v-if="$page.props.auth.user.role == 2" class="mb-4">
-      <inertia-link class="flex items-center group py-3" :href="route('phucap')">
-        <icon name="phucap" class="w-4 h-4 mr-2" :class="isUrl('phucap') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
-        <div :class="isUrl('phucap') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Phụ Cấp</div>
-      </inertia-link>
-    </div>
-    <div v-if="$page.props.auth.user.role > 0" class="mb-4">
-      <inertia-link class="flex items-center group py-3" :href="route('ungluong')">
-        <icon name="ungluong" class="w-4 h-4 mr-2" :class="isUrl('ungluong') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
-        <div :class="isUrl('ungluong') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Ứng Lương</div>
-      </inertia-link>
-    </div>
-    <div v-if="$page.props.auth.user.role > 0" class="mb-4">
-      <inertia-link class="flex items-center group py-3" :href="route('baohiem')">
-        <icon name="baohiem" class="w-4 h-4 mr-2" :class="isUrl('baohiem') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
-        <div :class="isUrl('baohiem') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Bảo Hiểm</div>
-      </inertia-link>
-    </div>
-    <div v-if="$page.props.auth.user.role > 0" class="mb-4">
-      <inertia-link class="flex items-center group py-3" :href="route('hopdong')">
-        <icon name="hopdong" class="w-4 h-4 mr-2" :class="isUrl('hopdong') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
-        <div :class="isUrl('hopdong') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Hợp Đồng</div>
-      </inertia-link>
-    </div>
-    <div v-if="$page.props.auth.user.role > 0" class="mb-4">
-      <inertia-link class="flex items-center group py-3" :href="route('nghiviec')">
-        <icon name="nghiviec" class="w-4 h-4 mr-2" :class="isUrl('nghiviec') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
-        <div :class="isUrl('nghiviec') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Nghỉ Việc</div>
-      </inertia-link>
-    </div>
-    <div v-if="$page.props.auth.user.role > 0" class="mb-4">
-      <inertia-link class="flex items-center group py-3" :href="route('thuongphat')">
-        <icon name="thuongphat" class="w-4 h-4 mr-2" :class="isUrl('thuongphat') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
-        <div :class="isUrl('thuongphat') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Thưởng Phạt</div>
-      </inertia-link>
-    </div>
-    <div v-if="$page.props.auth.user.role > 0" class="mb-4">
-      <inertia-link class="flex items-center group py-3" :href="route('khautru')">
-        <icon name="khautru" class="w-4 h-4 mr-2" :class="isUrl('khautru') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
-        <div :class="isUrl('khautru') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Khẩu Trừ</div>
-      </inertia-link>
-    </div>
-    <div v-if="$page.props.auth.user.role == 2" class="mb-4">
-      <inertia-link class="flex items-center group py-3" :href="route('bangchamcong')">
-        <icon name="chamcong" class="w-4 h-4 mr-2" :class="isUrl('bangchamcong') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
-        <div :class="isUrl('bangchamcong') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Chấm Công</div>
-      </inertia-link>
-    </div>
-    <div v-if="$page.props.auth.user.role > 0" class="mb-4">
-      <inertia-link class="flex items-center group py-3" :href="route('nhanluong')">
-        <icon name="nhanluong" class="w-4 h-4 mr-2" :class="isUrl('nhanluong') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
-        <div :class="isUrl('nhanluong') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Nhận Lương</div>
-      </inertia-link>
-    </div>
-    <div v-if="$page.props.auth.user.role > 0" class="mb-4">
-      <inertia-link class="flex items-center group py-3" :href="route('nhanvien')">
-        <icon name="users" class="w-4 h-4 mr-2" :class="isUrl('nhanvien') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
-        <div :class="isUrl('nhanvien') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Nhân Viên</div>
-      </inertia-link>
+    <div v-for="item in menuItems" :key="item.label" class="mb-1">
+      <div v-if="shouldShowItem(item)">
+        <component
+          :is="(item.children && item.children.length > 0) || !item.routeName ? 'div' : 'inertia-link'"
+          :href="!(item.children && item.children.length > 0) && item.routeName ? route(item.routeName) : null"
+          @click="item.children && item.children.length > 0 ? toggleSubmenu(item.label) : null"
+          class="flex items-center group py-4 pl-1 pr-2 rounded-md cursor-pointer font-medium"
+          :class="{
+            'bg-indigo-700 text-white': isActive(item) || openParentLabel === item.label,
+            'text-indigo-300 hover:text-white hover:bg-indigo-700': !(isActive(item) || openParentLabel === item.label)
+          }"
+        >
+          <icon
+            v-if="item.iconName"
+            :name="item.iconName"
+            class="w-4 h-4 mr-2 flex-shrink-0 fill-white"
+            
+          />
+          <span class="flex-grow whitespace-nowrap">{{ item.label }}</span>
+          <icon
+            v-if="item.children && item.children.length > 0"
+            name="cheveron-down"
+            class="w-3 h-3 flex-shrink-0 ml-4 transform transition-transform duration-200 fill-white"
+            :class="{
+              'rotate-180': openParentLabel === item.label
+              
+            }"
+          />
+        </component>
+
+        <div
+          v-if="item.children && item.children.length > 0 && openParentLabel === item.label"
+          class="mt-1 ml-4 pl-3"
+        >
+          <div v-for="child in item.children" :key="child.label" class="mb-1">
+            <inertia-link
+              v-if="shouldShowItem(child)"
+              :href="route(child.routeName)"
+              class="flex items-center group py-2 px-3 rounded-md text-sm font-medium "
+              :class="{
+                'bg-indigo-600 text-white': isActive(child),
+                'text-indigo-300 hover:text-white hover:bg-indigo-700': !isActive(child)
+              }"
+            >
+              <icon
+                v-if="child.iconName"
+                :name="child.iconName"
+                class="w-3 h-3 mr-4 flex-shrink-0 fill-white"
+                
+              />
+              <span>{{ child.label }}</span>
+            </inertia-link>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -82,13 +66,118 @@ export default {
   components: {
     Icon,
   },
+  data() {
+    return {
+      openParentLabel: null,
+      menuItems: [
+        { label: 'TỔNG QUAN HỆ THỐNG', isHeading: true, requiredRoleGT: 0 },
+        {
+          label: 'Trang Chủ',
+          routeName: 'dashboard',
+          iconName: 'dashboard',
+          checkActive: (pageUrl) => pageUrl === '',
+          requiredRoleGT: 0,
+        },
+        { label: 'QUẢN LÝ THÔNG TIN', isHeading: true, requiredRoleGT: 0 },
+        {
+          label: 'Nhân Viên', // Mục cha - chỉ để toggle
+          iconName: 'users',
+          requiredRoleGT: 0,
+          checkActive: (pageUrl) => pageUrl.startsWith('nhanvien') || pageUrl.startsWith('nghiviec'),
+          children: [
+            { label: 'Danh Sách Nhân Viên', routeName: 'nhanvien', iconName: 'users', requiredRoleGT: 0, checkActive: (pageUrl) => pageUrl.startsWith('nhanvien') },
+            { label: 'Nghỉ Việc', routeName: 'nghiviec', iconName: 'nghiviec', requiredRoleGT: 0, checkActive: (pageUrl) => pageUrl.startsWith('nghiviec') },
+          ],
+        },
+        {
+          label: 'Hợp Đồng', // Mục cha - chỉ để toggle
+          iconName: 'hopdong',
+          requiredRoleGT: 0,
+          checkActive: (pageUrl) => pageUrl.startsWith('hopdong') || pageUrl.startsWith('baohiem') || pageUrl.startsWith('khautru'),
+          children: [
+            { label: 'Danh sách Hợp Đồng', routeName: 'hopdong', iconName: 'hopdong', requiredRoleGT: 0, checkActive: (pageUrl) => pageUrl.startsWith('hopdong') },
+            { label: 'Bảo Hiểm', routeName: 'baohiem', iconName: 'baohiem', requiredRoleGT: 0, checkActive: (pageUrl) => pageUrl.startsWith('baohiem') },
+            { label: 'Khẩu Trừ', routeName: 'khautru', iconName: 'khautru', requiredRoleGT: 0, checkActive: (pageUrl) => pageUrl.startsWith('khautru') },
+          ],
+        },
+        { label: 'CHÍNH SÁCH & TÀI CHÍNH', isHeading: true, requiredRoleGT: 0 },
+        {
+          label: 'Hệ Số', // Mục cha - chỉ để toggle
+          iconName: 'heso',
+          requiredRole: 2, // Vai trò để thấy mục cha này (hoặc sẽ được xác định bởi con)
+          checkActive: (pageUrl) => pageUrl.startsWith('heso') || pageUrl.startsWith('phucap'),
+          children: [
+            { label: 'Danh sách Hệ Số', routeName: 'heso', iconName: 'heso', requiredRole: 2, checkActive: (pageUrl) => pageUrl.startsWith('heso') },
+            { label: 'Phụ Cấp', routeName: 'phucap', iconName: 'phucap', requiredRole: 2, checkActive: (pageUrl) => pageUrl.startsWith('phucap') },
+          ],
+        },
+        {
+          label: 'Quản Lý Chấm Công', // Mục cha mới
+          iconName: 'chamcong',
+          requiredRoleGT: 0, // Parent role should be permissive enough if children have mixed roles
+          checkActive: (pageUrl) => pageUrl.startsWith('bangchamcong') || pageUrl.startsWith('thuongphat'),
+          children: [
+            { label: 'Xem Bảng Chấm Công', routeName: 'bangchamcong', iconName: 'chamcong', requiredRole: 2, checkActive: (pageUrl) => pageUrl.startsWith('bangchamcong') },
+            { label: 'Thưởng Phạt', routeName: 'thuongphat', iconName: 'thuongphat', requiredRoleGT: 0, checkActive: (pageUrl) => pageUrl.startsWith('thuongphat') },
+          ],
+        },
+        {
+          label: 'Quản Lý Lương', // Mục cha mới
+          iconName: 'nhanluong',
+          requiredRoleGT: 0,
+          checkActive: (pageUrl) => pageUrl.startsWith('nhanluong') || pageUrl.startsWith('ungluong'),
+          children: [
+            { label: 'Nhận Lương', routeName: 'nhanluong', iconName: 'nhanluong', requiredRoleGT: 0, checkActive: (pageUrl) => pageUrl.startsWith('nhanluong') },
+            { label: 'Ứng Lương', routeName: 'ungluong', iconName: 'ungluong', requiredRoleGT: 0, checkActive: (pageUrl) => pageUrl.startsWith('ungluong') },
+          ],
+        },
+      ],
+    }
+  },
+  computed: {
+    currentUserRole() {
+      return this.$page.props.auth && this.$page.props.auth.user ? this.$page.props.auth.user.role : null;
+    },
+    pageUrlWithoutSlash() {
+        if (this.$page && typeof this.$page.url === 'string') {
+            return this.$page.url.substr(1);
+        }
+        return '';
+    }
+  },
   methods: {
-    isUrl(...urls) {
-      let currentUrl = this.$page.url.substr(1)
-      if (urls[0] === '') {
-        return currentUrl === ''
+    shouldShowItem(item) {
+      if (this.currentUserRole === null && (item.requiredRole !== undefined || item.requiredRoleGT !== undefined)) {
+        return false;
       }
-      return urls.filter(url => currentUrl.startsWith(url)).length
+      if (item.children && item.children.length > 0) {
+        const canShowAnyChild = item.children.some(child => this.shouldShowItem(child));
+        if (!canShowAnyChild) return false;
+        // If parent has its own specific role, check it too. Otherwise, if any child is visible, parent is.
+        if (item.requiredRole !== undefined && this.currentUserRole !== item.requiredRole) return false;
+        if (item.requiredRoleGT !== undefined && !(this.currentUserRole > item.requiredRoleGT)) return false;
+        return true;
+      }
+      if (item.requiredRole !== undefined) {
+        return this.currentUserRole === item.requiredRole;
+      }
+      if (item.requiredRoleGT !== undefined) {
+        return this.currentUserRole > item.requiredRoleGT;
+      }
+      return true;
+    },
+    isActive(item) {
+        if (item.checkActive) {
+            return item.checkActive(this.pageUrlWithoutSlash);
+        }
+        return false;
+    },
+    toggleSubmenu(itemLabel) {
+      if (this.openParentLabel === itemLabel) {
+        this.openParentLabel = null;
+      } else {
+        this.openParentLabel = itemLabel;
+      }
     },
   },
 }

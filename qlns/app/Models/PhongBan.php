@@ -35,4 +35,5 @@ class PhongBan extends Model
             }
         });
     }
+    
 }

@@ -20,7 +20,7 @@ class BangCap extends Model
 
     public function nhanvien()
     {
-        return $this->hasMany(NhanVien::class, 'id', 'nhanvien_id');
+        return $this->hasMany(NhanVien::class, 'bangcap_id', 'id');
     }
 
     public function scopeFilter($query, array $filters)

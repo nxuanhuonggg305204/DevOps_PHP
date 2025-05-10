@@ -56,7 +56,7 @@ class NhanVien extends Model
 
     public function thuongphat()
     {
-        return $this->hasMany(ThuongPhat::class, 'id', 'nhanvien_id');
+        return $this->hasMany(ThuongPhat::class, 'nhanvien_id', 'id');
     }
 
     public function ungluong()
@@ -159,4 +159,5 @@ class NhanVien extends Model
             }
         });
     }
+    
 }

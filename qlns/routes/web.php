@@ -485,6 +485,7 @@ Route::put('hopdong/{hopdong}/restore', [HopDongController::class, 'restore'])
     ->middleware('auth');
 
 // UngLuong
+Route::get('/ung-luong', [UngLuongController::class, 'index'])->name('ungluong.index');
 Route::get('ungluong', [UngLuongController::class, 'index'])
     ->name('ungluong')
     ->middleware('auth');
@@ -514,7 +515,7 @@ Route::put('ungluong/{ungluong}/restore', [UngLuongController::class, 'restore']
     ->middleware('auth');
 
 // NhanLuong
-
+Route::get('/nhan-luong', [NhanLuongController::class, 'index'])->name('nhanluong.index');
 Route::get('nhanluong/tinhluong', [NhanLuongController::class, 'tinhluong'])
     ->name('tinhluong')
     ->middleware('auth');
@@ -602,6 +603,7 @@ Route::put('nghiviec/{nghiviec}/restore', [NghiViecController::class, 'restore']
     ->middleware('auth');
 
 // NghiViec
+Route::get('/thuong-phat', [ThuongPhatController::class, 'index'])->name('thuongphat.index');
 Route::get('thuongphat', [ThuongPhatController::class, 'index'])
     ->name('thuongphat')
     ->middleware('auth');
