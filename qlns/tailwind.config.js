@@ -22,12 +22,12 @@ module.exports = {
       gray: colors.blueGray,
       indigo: {
         100: '#e6e8ff',
-        300: '#b2b7ff',
-        400: '#7886d7',
+        300: '#9BA2C6',
+        400: '#64667E',
         500: '#6574cd',
         600: '#5661b3',
-        800: '#2f365f',
-        900: '#191e38',
+        800: '#393C51',
+        900: '#393C51',
       },
     },
     extend: {
@@ -35,7 +35,7 @@ module.exports = {
         DEFAULT: theme('colors.gray.200', 'currentColor'),
       }),
       fontFamily: {
-        sans: ['Cerebri Sans', ...defaultTheme.fontFamily.sans],
+        sans: ['Montserrat', ...defaultTheme.fontFamily.sans],
       },
       boxShadow: theme => ({
         outline: '0 0 0 2px ' + theme('colors.indigo.500'),
