@@ -9,6 +9,7 @@ use App\Models\NgoaiNgu;
 use App\Models\ThuongPhat;
 use App\Models\NhanLuong;
 use App\Models\UngLuong;  
+use App\Models\PhongBan; 
 use Inertia\Inertia;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -22,13 +23,11 @@ class DashboardController extends Controller
         $ngayBatDau30NgayQua = Carbon::now()->subDays(30)->startOfDay();
         $soLuongNhanVienMoi = NhanVien::where('created_at', '>=', $ngayBatDau30NgayQua)->count();
 
-        $soLuongNhanVienNghiViec = NhanVien::where('trangthai', '!=', 1) // Hoặc where('trangthai', 0) nếu bạn chắc chắn
-                                          ->whereNotNull('ngaynghilam') // Đảm bảo có ngày nghỉ làm
-                                          ->where('ngaynghilam', '>=', $ngayBatDau30NgayQua)
+        $soLuongNhanVienNghiViec = NhanVien::where('trangthai', '!=', 1) 
                                           ->count();
 
         $nhanVienTheoBangCapData = NhanVien::join('bangcap', 'nhanvien.bangcap_id', '=', 'bangcap.id')
-            ->where('nhanvien.trangthai', 1) // Chỉ tính nhân viên đang làm việc
+            ->where('nhanvien.trangthai', 1) 
             ->select('bangcap.tenbc as ten', DB::raw('count(nhanvien.id) as soluong'))
             ->groupBy('bangcap.tenbc')
             ->orderBy('soluong', 'desc')
@@ -80,6 +79,25 @@ class DashboardController extends Controller
                                           ->where('nam', $currentYear)
                                           ->sum('sotien'); 
 
+        $nhanVienTheoPhongBanData = NhanVien::where('nhanvien.trangthai', 1) 
+            ->join('phucap', 'nhanvien.phucap_id', '=', 'phucap.id')
+            ->join('phongban', 'phucap.phongban_id', '=', 'phongban.id')
+            ->select('phongban.tenpb as ten_phong_ban', DB::raw('count(nhanvien.id) as so_luong_nhan_vien'))
+            ->groupBy('phongban.tenpb')
+            ->orderBy('so_luong_nhan_vien', 'desc')
+            ->get();
+        
+        $nhanVienSinhNhatThangNay = NhanVien::where('trangthai', 1) // Chỉ nhân viên đang làm việc
+                                           ->whereMonth('ngaysinh', $currentMonth) // Lọc theo tháng sinh
+                                           ->orderByRaw('DAY(ngaysinh) ASC') // Sắp xếp theo ngày sinh trong tháng
+                                           ->select('hovaten', 'ngaysinh') // Chỉ lấy các cột cần thiết
+                                           ->get()
+                                           ->map(function ($nhanvien) {
+                                               // Format lại ngày sinh chỉ hiển thị ngày và tháng
+                                               $nhanvien->ngaysinh_formatted = Carbon::parse($nhanvien->ngaysinh)->format('d/m');
+                                               return $nhanvien;
+                                           });
+
         return Inertia::render('Dashboard/Index', [
             'tongSoNhanVienDangLamViec' => $tongSoNhanVienDangLamViec,
             'soLuongNhanVienMoi' => $soLuongNhanVienMoi,
@@ -91,6 +109,8 @@ class DashboardController extends Controller
             'topNhanVienPhat' => $topPhat,
             'soNhanVienDaThanhToanLuong' => $soNhanVienDaThanhToanLuong,
             'tongTienUngLuongThangNay' => $tongTienUngLuongThangNay ?? 0,
+            'nhanVienTheoPhongBanChart' => $nhanVienTheoPhongBanData,
+            'nhanVienSinhNhatThangNay' => $nhanVienSinhNhatThangNay,
         ]);
     }
 }

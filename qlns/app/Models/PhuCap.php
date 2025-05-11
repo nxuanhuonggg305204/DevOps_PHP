@@ -29,9 +29,9 @@ class PhuCap extends Model
         return $this->belongsTo(ChucVu::class, 'chucvu_id', 'id')->withTrashed();
     }
 
-    public function nhanvien()
+    public function nhanviens()
     {
-        return $this->hasMany(NhanVien::class, 'id', 'nhanvien_id');
+        return $this->hasMany(NhanVien::class, 'phucap_id', 'id');
     }
 
     public function getAll()
