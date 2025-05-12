@@ -1,16 +1,6 @@
 
 Quản lý nhân sự
 
-## chạy code bằng 1 số lệnh sau đây:
-
-composer install<br>
-composer update<br>
-npm install (cài thư viện nodejs)<br>
-npm run dev (lưu ý nếu không chạy dòng này code không thể chạy được vì không render ra dc view)<br>
-php artisan key:generate (tạo file .env rồi chạy lệnh này)<br>
-php artisan migrate<br>
-php artisan db:seed
-
 ## các tài khoản được dùng
 
 user: admin@email.com<br>

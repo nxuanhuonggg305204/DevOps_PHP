@@ -23,6 +23,14 @@ class PhongBan extends Model
         return $this->hasMany(MucLuong::class, 'id', 'phongban_id');
     }
 
+    public function phucaps()
+    {
+    return $this->hasMany(PhuCap::class, 'phongban_id', 'id');
+    }
+    public function nhanViensQuaPhuCap() 
+    {
+        return $this->hasManyThrough(NhanVien::class, PhuCap::class, 'phongban_id', 'phucap_id', 'id', 'id');
+    }
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {

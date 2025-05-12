@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1 class="mb-8 font-bold text-3xl">Trang Chủ</h1>
-
+    <div v-if="currentUserRole === 1 || currentUserRole === 2">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
       <div class="bg-white rounded-lg shadow-xl p-6">
         <div class="flex items-center">
@@ -64,14 +64,50 @@
         </p>
       </div>
       <div class="flex space-x-4">
-        <inertia-link :href="route('nhanluong.index')" class="px-10 py-2 bg-indigo-600 text-white rounded-md hover:bg-blue-600 text-sm font-medium">
+        <inertia-link :href="route('nhanluong.index')" class="px-10 py-2 bg-gray-200 text-black rounded-md hover:bg-indigo-600 text-sm hover:text-white font-medium">
           Chi tiết Thanh toán Lương
         </inertia-link>
-        <inertia-link :href="route('ungluong.index')" class="px-10 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-800 text-sm font-medium">
+        <inertia-link :href="route('ungluong.index')" class="px-10 py-2 bg-gray-200 text-black rounded-md hover:bg-indigo-600 text-sm hover:text-white font-medium">
           Chi tiết Ứng Lương
         </inertia-link>
       </div>
     </div>
+    <div class="mb-10 bg-white rounded-lg shadow-md p-6">
+      <h2 class="mb-4 text-2xl font-semibold text-gray-700">Số Lượng Nhân Viên Theo Phòng Ban</h2>
+      <div style="position: relative;  width:100%; ">
+        <CustomBarChart
+          v-if="chartDataReady.nvTheoPhongBan"
+          :chart-data="nhanVienTheoPhongBanComputedChartData"
+          :chart-options="barChartOptions"
+          chart-id="nv-phong-ban-chart-standalone"
+          dataset-id-key="nvphongban-standalone"
+          />
+          <p v-else class="text-gray-500 italic">Không có dữ liệu nhân viên theo phòng ban hoặc dữ liệu chưa sẵn sàng.</p>
+      </div>
+    </div>
+      <div class="mb-10 bg-white rounded-lg shadow-md p-6">
+        <h2 class="mb-4 text-xl font-semibold text-gray-700">Sinh Nhật Trong Tháng {{ currentMonth }}</h2>
+        <div v-if="nhanVienSinhNhatThangNay && nhanVienSinhNhatThangNay.length > 0">
+          <div class="space-y-3 overflow-y-auto" style="max-height: 320px;"> 
+            <div v-for="nv in displayedBirthdayList" :key="nv.hovaten" class="py-2 px-1 border-b border-gray-100 last:border-b-0">
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-gray-800">{{ nv.hovaten }}</p>
+                <p class="text-xs text-gray-600 bg-sky-100 text-sky-700 px-2 py-1 rounded">Ngày: {{ nv.ngaysinh_formatted }}</p>
+              </div>
+            </div>
+          </div>
+          <div v-if="canShowMoreBirthdays" class="mt-4 text-center">
+            <button
+              @click="showMoreBirthdays"
+              class="text-sm text-indigo-600 hover:text-indigo-800 font-medium focus:outline-none"
+            >
+              Xem thêm (còn {{ nhanVienSinhNhatThangNay.length - birthdayVisibleItemsCount }} người)
+            </button>
+          </div>
+        </div>
+        <p v-else class="text-gray-500 italic">Không có nhân viên nào có sinh nhật trong tháng này.</p>
+      </div>
+      
     <div class="mb-10 bg-white rounded-lg shadow-md p-6">
       <h2 class="mb-4 text-2xl font-semibold text-gray-700">Thống Kê & Báo Cáo Chi Tiết</h2>
 
@@ -223,23 +259,33 @@
         
         <p v-if="!selectedDisplayType && (nhanVienTheoBangCap || topNhanVienThuong)" class="text-gray-500 italic mt-4">Vui lòng chọn một mục để xem chi tiết.</p>
       </div>
+      </div>
+      
+    </div>
+    <div v-else-if="currentUserRole === 0" class="mt-6">
+      <p class="text-lg text-gray-700">Chào mừng bạn đến với hệ thống!</p>
+      </div>
+      <div v-else class="mt-6">
+        <p class="text-lg text-gray-600">Bạn không có quyền truy cập vào nội dung này.</p>
     </div>
   </div>
 </template>
 
 <script>
 import Layout from '@/Shared/Layout'
-import { Pie as CustomPieChart } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale } from 'chart.js'
+import { Pie as CustomPieChart, Bar as CustomBarChart } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale, BarElement, LinearScale } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, ChartDataLabels);
+ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, BarElement, LinearScale, ChartDataLabels);
+
 
 export default {
   metaInfo: { title: 'Dashboard' },
   layout: Layout,
   components: {
     CustomPieChart,
+    CustomBarChart,
   },
   props: {
     tongSoNhanVienDangLamViec: Number,
@@ -253,6 +299,8 @@ export default {
     topNhanVienPhat: Array,
     soNhanVienDaThanhToanLuong: Number,
     tongTienUngLuongThangNay: Number,
+    nhanVienTheoPhongBanChart: Array,
+    nhanVienSinhNhatThangNay: Array,
   },
   data() {
     return {
@@ -263,12 +311,52 @@ export default {
         bangCap: false,
         chuyenMon: false,
         ngoaiNgu: false,
+        nvTheoPhongBan: false,
       },
       currentMonth: new Date().getMonth() + 1, 
       currentYear: new Date().getFullYear(),
+      birthdayItemsPerPage: 5,
+      birthdayVisibleItemsCount: 5,
     }
   },
   computed: {
+    nhanVienTheoPhongBanComputedChartData() {
+      if (!this.nhanVienTheoPhongBanChart || this.nhanVienTheoPhongBanChart.length === 0) {
+        return { labels: [], datasets: [{ data: [] }] };
+      }
+      const labels = this.nhanVienTheoPhongBanChart.map(item => item.ten_phong_ban);
+      const data = this.nhanVienTheoPhongBanChart.map(item => item.so_luong_nhan_vien);
+      return {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Số lượng nhân viên',
+            backgroundColor: '#42A5F5', // Một màu hoặc mảng màu
+            borderColor: '#1E88E5',
+            borderWidth: 1,
+            data: data,
+            barPercentage: 0.5, 
+            categoryPercentage: 0.7, 
+          }
+        ]
+      };
+    },
+    displayedBirthdayList() {
+      if (!this.nhanVienSinhNhatThangNay) {
+        return [];
+      }
+      return this.nhanVienSinhNhatThangNay.slice(0, this.birthdayVisibleItemsCount);
+    },
+    // Computed property để kiểm tra xem có thể "Xem thêm" sinh nhật không
+    canShowMoreBirthdays() {
+      if (!this.nhanVienSinhNhatThangNay) {
+        return false;
+      }
+      return this.birthdayVisibleItemsCount < this.nhanVienSinhNhatThangNay.length;
+    },
+    currentUserRole() {
+      return this.$page.props.auth && this.$page.props.auth.user ? this.$page.props.auth.user.role : null;
+    },
     baseChartOptions() {
       return {
         responsive: true,
@@ -277,7 +365,34 @@ export default {
             duration: 1000,
             easing: 'easeInOutQuart',
         },
+        indexAxis: 'x', 
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1,
+              color: '#374151',
+              precision: 0
+            },
+            grid: { borderColor: '#D1D5DB', color: '#E5E7EB' }
+          },
+          x: {
+            ticks: {
+              color: '#374151',
+              
+              autoSkip: true,
+              maxRotation: 70, 
+              minRotation: 20 
+            },
+            grid: { display: false }
+          }
+        },
         plugins: {
+          datalabels: { 
+            display: true,
+            color: '#FFFFFF',
+            font: { weight: 'semibold', size: 10 }
+          },
           legend: {
             position: 'top',
             labels: {
@@ -306,8 +421,8 @@ export default {
               }
               return '';
             },
-            color: '#fff', // Màu chữ phần trăm
-            font: { weight: 'bold', size: 12, }, // Kích thước chữ phần trăm
+            color: '#fff', 
+            font: { weight: 'bold', size: 12, }, 
             anchor: 'center',
             align: 'center',
           }
@@ -315,18 +430,18 @@ export default {
       };
     },
     bangCapChartData() {
-      return this.formatChartData(this.nhanVienTheoBangCap);
+      return this.formatChartData(this.nhanVienTheoBangCap,true);
     },
     chuyenMonChartData() {
-      return this.formatChartData(this.nhanVienTheoChuyenMon);
+      return this.formatChartData(this.nhanVienTheoChuyenMon,true);
     },
     ngoaiNguChartData() {
-      return this.formatChartData(this.nhanVienTheoNgoaiNgu);
+      return this.formatChartData(this.nhanVienTheoNgoaiNgu,true);
     },
     paymentProgressPercentage() {
       if (this.tongSoNhanVienDangLamViec > 0 && this.soNhanVienDaThanhToanLuong !== undefined) {
         const percentage = (this.soNhanVienDaThanhToanLuong / this.tongSoNhanVienDangLamViec) * 100;
-        return Math.min(Math.max(percentage, 0), 100); // Đảm bảo tỷ lệ từ 0 đến 100
+        return Math.min(Math.max(percentage, 0), 100); 
       }
       return 0;
     }
@@ -352,6 +467,7 @@ export default {
       this.chartDataReady.bangCap = !!(this.nhanVienTheoBangCap && this.nhanVienTheoBangCap.length > 0 && this.bangCapChartData.labels && this.bangCapChartData.labels.length > 0);
       this.chartDataReady.chuyenMon = !!(this.nhanVienTheoChuyenMon && this.nhanVienTheoChuyenMon.length > 0 && this.chuyenMonChartData.labels && this.chuyenMonChartData.labels.length > 0);
       this.chartDataReady.ngoaiNgu = !!(this.nhanVienTheoNgoaiNgu && this.nhanVienTheoNgoaiNgu.length > 0 && this.ngoaiNguChartData.labels && this.ngoaiNguChartData.labels.length > 0);
+      this.chartDataReady.nvTheoPhongBan = !!(this.nhanVienTheoPhongBanChart && this.nhanVienTheoPhongBanChart.length > 0 && this.nhanVienTheoPhongBanComputedChartData.labels && this.nhanVienTheoPhongBanComputedChartData.labels.length > 0);
     },
     
     selectDisplayType(type) {
@@ -362,12 +478,20 @@ export default {
             return '0 ₫';
         }
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+    },
+    showMoreBirthdays() {
+      this.birthdayVisibleItemsCount += this.birthdayItemsPerPage;
+      // Không để vượt quá tổng số lượng
+      if (this.birthdayVisibleItemsCount > this.nhanVienSinhNhatThangNay.length) {
+        this.birthdayVisibleItemsCount = this.nhanVienSinhNhatThangNay.length;
+      }
     }
   },
   watch: {
     nhanVienTheoBangCap: { handler: 'updateChartDataReadyStates', immediate: true },
     nhanVienTheoChuyenMon: { handler: 'updateChartDataReadyStates', immediate: true },
     nhanVienTheoNgoaiNgu: { handler: 'updateChartDataReadyStates', immediate: true },
+    nhanVienTheoPhongBanChart: { handler: 'updateChartDataReadyStates', immediate: true },
   },
   mounted() {
     console.log('Dashboard Mounted - Props Bằng Cấp:', this.nhanVienTheoBangCap);
@@ -375,6 +499,7 @@ export default {
     console.log('Dashboard Mounted - Top Phạt:', this.topNhanVienPhat);
     console.log('Dashboard Mounted - Số NV đã thanh toán:', this.soNhanVienDaThanhToanLuong);
     console.log('Dashboard Mounted - Tổng ứng lương:', this.tongTienUngLuongThangNay);
+    console.log('Dashboard Mounted - NV theo Phòng Ban Chart Data (prop):', this.nhanVienTheoPhongBanChart);
   }
 }
 </script>

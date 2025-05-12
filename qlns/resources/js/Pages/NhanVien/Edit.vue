@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="mb-8 flex justify-between items-center">
-      <h1 class="font-bold text-3xl">
+      <h1 class="font-bold text-xl">
         <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('nhanvien')">Nhân Viên</inertia-link>
         <span class="text-indigo-400 font-medium">/</span>
         {{ form.hovaten }}
       </h1>
-      <div>
+      <div class="flex flex-wrap justify-end gap-2 md:space-x-2">
         <inertia-link v-if="$page.props.auth.user.role > 0" class="btn-indigo" :href="route('thuongphat.create', nhanvien.id)">
             <span>Thưởng Phạt</span>
         </inertia-link>
@@ -30,7 +30,7 @@
     <div class="bg-white rounded-md shadow overflow-hidden">
       <form @submit.prevent="update">
         <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
-          <text-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.hovaten" :error="form.errors.hovaten" class="pr-6 pb-8 w-full lg:w-1/2" label="Họ và tên" />
+          <styled-text-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.hovaten" :error="form.errors.hovaten" class="pr-6 pb-8 w-full lg:w-1/2" label="Họ và tên" />
           <select-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.gioitinh" :error="form.errors.gioitinh" class="pr-6 pb-8 w-full lg:w-1/2" label="Giới tính">
             <option :value="null">- Chọn --</option>
             <option :value="0">Nam</option>
@@ -38,11 +38,11 @@
           </select-input>
           <select-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.trangthai" :error="form.errors.trangthai" class="pr-6 pb-8 w-full lg:w-1/2" label="Trạng thái làm việc">
             <option :value="null">- Chọn -</option>
-            <option :value="0">Đã nghĩ việc</option>
+            <option :value="0">Đã nghỉ việc</option>
             <option :value="1">Đang làm việc</option>
           </select-input>
-          <text-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.ngaysinh" :error="form.errors.ngaysinh" class="pr-6 pb-8 w-full lg:w-1/2" type="date" label="Ngày sinh" />
-          <text-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.hesoluong" :error="form.errors.hesoluong" class="pr-6 pb-8 w-full lg:w-1/2" label="Hệ số lương" />
+          <styled-text-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.ngaysinh" :error="form.errors.ngaysinh" class="pr-6 pb-8 w-full lg:w-1/2" type="date" label="Ngày sinh" />
+          <styled-text-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.hesoluong" :error="form.errors.hesoluong" class="pr-6 pb-8 w-full lg:w-1/2" label="Hệ số lương" />
           <select-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.phucap" :error="form.errors.phucap" class="pr-6 pb-8 w-full lg:w-1/2" label="Phòng ban -> chức vụ">
             <option :value="null">- Chọn -</option>
             <option v-for="pc in phucap" :key="pc.id" :value="pc.id">{{ pc.tenpb }} -> {{ pc.tencv }}</option>
@@ -80,10 +80,10 @@
             <option :value="null">- Chọn -</option>
             <option v-for="td in dantoc" :key="td.id" :value="td.id">{{ td.tendt }}</option>
           </select-input>
-          <text-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.sdt" :error="form.errors.sdt" class="pr-6 pb-8 w-full lg:w-1/2" label="Số điện thoại" />
-          <text-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.cmnd" :error="form.errors.cmnd" class="pr-6 pb-8 w-full lg:w-1/2" type="number" label="CMND" />
-          <text-input v-model="form.diachi" :error="form.errors.diachi" class="pr-6 pb-8 w-full lg:w-1/2" label="Địa chỉ" />
-          <text-input v-model="form.quequan" :error="form.errors.quequan" class="pr-6 pb-8 w-full lg:w-1/2" label="Quê quán" />
+          <styled-text-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.sdt" :error="form.errors.sdt" class="pr-6 pb-8 w-full lg:w-1/2" label="Số điện thoại" />
+          <styled-text-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.cmnd" :error="form.errors.cmnd" class="pr-6 pb-8 w-full lg:w-1/2" type="number" label="CMND" />
+          <styled-text-input v-model="form.diachi" :error="form.errors.diachi" class="pr-6 pb-8 w-full lg:w-1/2" label="Địa chỉ" />
+          <styled-text-input v-model="form.quequan" :error="form.errors.quequan" class="pr-6 pb-8 w-full lg:w-1/2" label="Quê quán" />
           <file-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.photo" :error="form.errors.photo" class="pr-6 pb-8 w-full lg:w-1/1" type="file" accept="image/*" label="Ảnh đại diện" />
         </div>
         <div class="px-8 py-4 bg-gray-50 border-t border-gray-100 flex items-center">
@@ -283,10 +283,11 @@
 import Icon from '@/Shared/Icon'
 import Layout from '@/Shared/Layout'
 import FileInput from '@/Shared/FileInput'
-import TextInput from '@/Shared/TextInput'
+import TextInput from '@/Shared/StyledTextInput'
 import SelectInput from '@/Shared/SelectInput'
 import LoadingButton from '@/Shared/LoadingButton'
 import TrashedMessage from '@/Shared/TrashedMessage'
+import StyledTextInput from '../../Shared/StyledTextInput.vue'
 
 export default {
   metaInfo() {
@@ -299,7 +300,7 @@ export default {
     FileInput,
     LoadingButton,
     SelectInput,
-    TextInput,
+    StyledTextInput,
     TrashedMessage,
   },
   layout: Layout,

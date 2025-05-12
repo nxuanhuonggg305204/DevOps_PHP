@@ -88,7 +88,10 @@ class NhanVien extends Model
     {
         return $this->belongsTo(MucLuong::class, 'phucap_id', 'id');
     }
-
+    public function phucapRelation() 
+    {
+    return $this->belongsTo(PhuCap::class, 'phucap_id', 'id');
+    }
     public function ngoaingu()
     {
         return $this->belongsTo(NgoaiNgu::class, 'ngoaingu_id', 'id');
@@ -139,7 +142,19 @@ class NhanVien extends Model
                 $temp[$i] = $list[$i] ?? null;
         return $temp;
     }
-
+    // Trong NhanVien.php
+    public function phongBanQuaPhuCap() 
+    {
+    
+        return $this->hasOneThrough(
+            PhongBan::class, 
+            PhuCap::class,   
+            'id',            
+            'id',            
+            'phucap_id',     
+            'phongban_id'    
+        );
+    }
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {
