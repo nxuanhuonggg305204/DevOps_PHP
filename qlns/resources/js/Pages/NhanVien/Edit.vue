@@ -38,7 +38,7 @@
           </select-input>
           <select-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.trangthai" :error="form.errors.trangthai" class="pr-6 pb-8 w-full lg:w-1/2" label="Trạng thái làm việc">
             <option :value="null">- Chọn -</option>
-            <option :value="0">Đã nghĩ việc</option>
+            <option :value="0">Đã nghỉ việc</option>
             <option :value="1">Đang làm việc</option>
           </select-input>
           <styled-text-input :disabled="$page.props.auth.user.role > 0 ? false : true" v-model="form.ngaysinh" :error="form.errors.ngaysinh" class="pr-6 pb-8 w-full lg:w-1/2" type="date" label="Ngày sinh" />

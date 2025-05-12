@@ -31,10 +31,10 @@
         "vue": "^2.6.11",
         "vue-chartjs": "^4.1.2",
         "vue-loader": "^15.9.6",
-        "vue-meta": "^2.3.1",
-        "vue-template-compiler": "^2.6.12"
+        "vue-meta": "^2.3.1"
     },
     "devDependencies": {
-        "cross-env": "^7.0.3"
+        "cross-env": "^7.0.3",
+        "vue-template-compiler": "^2.7.16"
     }
 }
