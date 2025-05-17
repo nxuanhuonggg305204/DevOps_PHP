@@ -6,14 +6,9 @@ RUN apk add --no-cache \
     unzip \
     zip \
     libzip-dev \
-    # PHP extensions thường dùng cho Laravel
-    # GD cho xử lý hình ảnh
     libpng-dev libjpeg-turbo-dev freetype-dev libwebp-dev \
-    # Intl cho quốc tế hóa
     icu-dev \
-    # Các extensions khác
-    oniguruma-dev # Cho mbstring
-    # Xóa cache của apk sau khi cài đặt
+    oniguruma-dev \
     && rm -rf /var/cache/apk/*
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) \
@@ -33,7 +28,7 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 
 # Sao chép toàn bộ mã nguồn ứng dụng
-COPY ..
+COPY . .
 # BIẾN MÔI TRƯỜNG THỰC TẾ SẼ ĐƯỢC INJECT KHI RUNTIME.
 RUN cp .env.example .env \
     && php artisan key:generate --force \
