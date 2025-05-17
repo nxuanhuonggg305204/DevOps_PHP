@@ -1,0 +1,9 @@
+.git
+node_modules
+vendor
+.env
+*.log
+*.sqlite
+Dockerfile
+docker-compose.yml
+default.conf
