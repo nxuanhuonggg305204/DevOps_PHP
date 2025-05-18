@@ -6,6 +6,7 @@ RUN apk add --no-cache \
     unzip \
     zip \
     libzip-dev \
+    zlib-dev \
     libpng-dev libjpeg-turbo-dev freetype-dev libwebp-dev \
     icu-dev \
     oniguruma-dev \
@@ -49,6 +50,7 @@ RUN apk add --no-cache \
     icu-libs \
     # Các extensions khác
     libzip \
+    zlib \
     # Xóa cache của apk sau khi cài đặt
     && rm -rf /var/cache/apk/*
 # Lưu ý: các thư viện -dev đã được cài ở stage 'vendor' để build, ở đây chỉ cần thư viện runtime
