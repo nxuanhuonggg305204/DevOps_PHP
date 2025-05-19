@@ -35,15 +35,18 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 
 # Cài đặt dependencies của PHP cho production, không chạy scripts tự động của composer ở bước này
+# --optimize-autoloader đã được thêm ở đây
 RUN composer install --no-interaction --no-dev --no-plugins --no-scripts --prefer-dist --optimize-autoloader
 
 # Sao chép toàn bộ mã nguồn ứng dụng
 COPY . .
 
 # Chạy các lệnh Artisan để tối ưu hóa cho production
-# Trình tự quan trọng: tạo key, dọn dẹp cache cũ, khám phá package (dựa trên các package đã cài), rồi mới cache config.
+# Trình tự quan trọng: tạo key, dump-autoload, dọn dẹp cache cũ, khám phá package, rồi mới cache config.
 RUN cp .env.example .env \
     && php artisan key:generate --force \
+    # Đảm bảo autoloader được tối ưu hóa cho --no-dev một cách tường minh trước khi chạy các lệnh discover/cache
+    && composer dump-autoload --optimize --no-dev \
     && php artisan optimize:clear \
     && php artisan package:discover \
     && php artisan config:cache \
@@ -96,6 +99,6 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=app_php_fpm /var/www/html/public /var/www/html/public
 RUN chown -R nginx:nginx /var/www/html/public && \
-    chmod -R 755 /var/www/html/public
+chmod -R 755 /var/www/html/public
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
