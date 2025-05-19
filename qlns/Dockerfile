@@ -1,11 +1,9 @@
 # --- Giai đoạn 1: PHP Dependencies & Application Code ---
-# Sử dụng base image PHP chính thức với FPM và Alpine Linux (nhẹ)
-# Thay '8.2' bằng phiên bản PHP bạn đang sử dụng (ví dụ: 8.1, 8.3)
 FROM php:8.2-fpm-alpine AS vendor
 
 # Cài đặt các gói hệ thống cần thiết cho việc build và các PHP extensions
 RUN apk add --no-cache \
-    build-base \ 
+    build-base \
     curl \
     git \
     unzip \
@@ -32,27 +30,27 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
 # Cài đặt Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Thiết lập thư mục làm việc
 WORKDIR /var/www/html
 
-# Sao chép các file composer trước để tận dụng Docker layer caching
 COPY composer.json composer.lock ./
 
-# Cài đặt dependencies của PHP cho production
+# Cài đặt dependencies của PHP cho production, không chạy scripts tự động của composer ở bước này
 RUN composer install --no-interaction --no-dev --no-plugins --no-scripts --prefer-dist --optimize-autoloader
 
 # Sao chép toàn bộ mã nguồn ứng dụng
 COPY . .
 
 # Chạy các lệnh Artisan để tối ưu hóa cho production
+# Trình tự quan trọng: tạo key, dọn dẹp cache cũ, khám phá package (dựa trên các package đã cài), rồi mới cache config.
 RUN cp .env.example .env \
     && php artisan key:generate --force \
+    && php artisan optimize:clear \
+    && php artisan package:discover \
     && php artisan config:cache \
     && php artisan route:cache \
-    && php artisan view:cache \
-    && php artisan package:discover
+    && php artisan view:cache
 
-# Xóa các file không cần thiết cho production image
+# Xóa file .env tạm thời
 RUN rm .env
 
 # --- Giai đoạn 2: PHP-FPM Image Cuối cùng ---
@@ -60,21 +58,17 @@ FROM php:8.2-fpm-alpine AS app_php_fpm
 
 # Cài đặt các gói cần thiết cho runtime VÀ build-time cho extensions trong stage này
 RUN apk add --no-cache \
-    build-base \ 
+    build-base \
     libzip-dev \
-    zlib-dev \  
-    libpng-dev libjpeg-turbo-dev freetype-dev libwebp-dev \ 
-    icu-dev \   
-    oniguruma-dev \ 
-    # Các thư viện runtime (không có -dev) sẽ được tự động cài đặt như là dependency của các gói -dev trên
-    # Hoặc bạn có thể liệt kê rõ ràng: libpng libjpeg-turbo freetype libwebp icu-libs libzip zlib
+    zlib-dev \
+    libpng-dev libjpeg-turbo-dev freetype-dev libwebp-dev \
+    icu-dev \
+    oniguruma-dev \
     && rm -rf /var/cache/apk/*
 
-# Cài đặt các PHP extensions cần thiết (lặp lại từ stage vendor nếu cần build lại trong stage này)
-# Nếu bạn muốn image nhỏ hơn, bạn có thể COPY các file .so đã biên dịch từ stage 'vendor'
-# thay vì chạy lại docker-php-ext-install. Nhưng để đơn giản và đảm bảo, chúng ta cài lại.
+# Cài đặt các PHP extensions cần thiết
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-&& docker-php-ext-install -j$(nproc) \
+    && docker-php-ext-install -j$(nproc) \
     gd \
     intl \
     mbstring \
@@ -84,20 +78,14 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     zip \
     bcmath
 
-# Thiết lập thư mục làm việc
 WORKDIR /var/www/html
 
-# Sao chép mã nguồn đã xử lý (bao gồm thư mục vendor) từ giai đoạn 'vendor'
 COPY --from=vendor /var/www/html .
 
-# Thiết lập quyền sở hữu và quyền ghi cho thư mục storage và bootstrap/cache
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Mở cổng 9000 cho PHP-FPM
 EXPOSE 9000
-
-# Lệnh mặc định để chạy PHP-FPM
 CMD ["php-fpm"]
 
 # --- Giai đoạn 3: Web Server (Nginx) ---
